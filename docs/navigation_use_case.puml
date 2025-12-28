@@ -1,0 +1,84 @@
+@startuml MustStudy导航系统用例图
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseStyle roundbox
+
+'定义角色
+actor 访客 as Visitor
+actor 学习者 as Student
+
+'定义矩形边界
+rectangle "MustStudy导航系统" {
+    package "核心页面" {
+        usecase "主页" as HomePage
+        usecase "个人中心" as ProfilePage
+        usecase "成就页面" as AchievementPage
+        usecase "资源页面" as ResourcePage
+        usecase "论坛页面" as ForumPage
+    }
+
+    package "页面权限" {
+        usecase "访问完整功能" as FullAccess
+        usecase "访问有限功能" as LimitedAccess
+        usecase "触发登录" as TriggerLogin
+    }
+}
+
+'访客权限
+Visitor --> HomePage
+Visitor --> ProfilePage
+Visitor --> AchievementPage
+Visitor --> ResourcePage
+Visitor --> ForumPage
+
+'学习者权限
+Student --> HomePage
+Student --> ProfilePage
+Student --> AchievementPage
+Student --> ResourcePage
+Student --> ForumPage
+
+'功能访问关系
+HomePage ..> LimitedAccess : <<include>>
+ProfilePage ..> TriggerLogin : <<include>>
+AchievementPage ..> TriggerLogin : <<include>>
+ResourcePage ..> TriggerLogin : <<include>>
+ForumPage ..> TriggerLogin : <<include>>
+
+Student --> FullAccess
+FullAccess ..> HomePage : <<extend>>
+FullAccess ..> ProfilePage : <<extend>>
+FullAccess ..> AchievementPage : <<extend>>
+FullAccess ..> ResourcePage : <<extend>>
+FullAccess ..> ForumPage : <<extend>>
+
+'页面间导航
+HomePage <--> ProfilePage : 底部导航栏
+HomePage <--> AchievementPage : 底部导航栏
+HomePage <--> ResourcePage : 底部导航栏
+HomePage <--> ForumPage : 底部导航栏
+
+'添加注释
+note right of HomePage
+  访客可以浏览有限内容
+  无需登录即可访问
+end note
+
+note right of ProfilePage
+  访客模式下显示登录入口
+  登录后显示完整信息
+end note
+
+note right of AchievementPage
+  访客可以查看成就展示
+  需要登录才能获得进度
+end note
+
+note right of TriggerLogin
+  触发登录弹窗
+  可选择登录方式
+  可跳转到注册
+end note
+
+@enduml 

@@ -1,0 +1,277 @@
+@startuml MustStudy成就系统用例图
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecaseStyle roundbox
+
+'定义角色
+actor 访客 as Visitor
+actor 学习者 as Student
+actor 系统 as System
+
+'定义矩形边界
+rectangle "MustStudy学习系统" {
+    package "身份认证" {
+        usecase "查看欢迎页" as ViewWelcome
+        usecase "登录" as Login
+        usecase "注册" as Register
+        usecase "重置密码" as ResetPassword
+        usecase "第三方登录" as ThirdPartyLogin
+        usecase "验证手机号" as VerifyPhone
+        usecase "验证邮箱" as VerifyEmail
+    }
+
+    package "主页面功能" {
+        usecase "浏览推荐内容" as BrowseRecommended
+        usecase "查看学习统计" as ViewLearningStats
+        usecase "搜索学习内容" as SearchContent
+        usecase "查看通知" as ViewNotifications
+    }
+
+    package "成就系统" {
+        package "成就管理" {
+            usecase "查看成就墙" as ViewAchievements
+            usecase "查看当前探索进度" as ViewCurrentProgress
+            usecase "设置当前探索成就" as SetCurrentAchievement
+            usecase "完成学习任务" as CompleteTask
+            usecase "解锁新成就" as UnlockAchievement
+            usecase "查看成就详情" as ViewAchievementDetails
+            usecase "查看成就完成度统计" as ViewStats
+            usecase "查看里程碑进度" as ViewMilestones
+            usecase "获取成就奖励" as GetRewards
+            usecase "分享成就" as ShareAchievement
+        }
+
+        package "成就数据处理" {
+            usecase "验证成就条件" as ValidateConditions
+            usecase "更新进度" as UpdateProgress
+            usecase "保存成就状态" as SaveState
+            usecase "计算完成度" as CalculateProgress
+            usecase "管理里程碑" as ManageMilestones
+            usecase "转换JSON数据" as HandleJson
+        }
+
+        package "UI交互" {
+            usecase "显示成就对话框" as ShowAchievementDialog
+            usecase "展示进度动画" as ShowProgressAnimation
+            usecase "绘制山脉背景" as DrawMountainBackground
+            usecase "绘制进度路径" as DrawProgressPath
+        }
+    }
+
+    package "学习资源" {
+        usecase "浏览资源列表" as BrowseResources
+        usecase "筛选资源类型" as FilterResources
+        usecase "收藏学习资源" as BookmarkResource
+        usecase "下载资源" as DownloadResource
+        usecase "评分和评论" as RateAndComment
+    }
+
+    package "学习论坛" {
+        usecase "浏览问题列表" as BrowseQuestions
+        usecase "发布新问题" as PostQuestion
+        usecase "回答问题" as AnswerQuestion
+        usecase "点赞和收藏" as LikeAndCollect
+        usecase "筛选问题类型" as FilterQuestions
+    }
+
+    package "个人中心" {
+        usecase "查看个人信息" as ViewProfile
+        usecase "编辑个人资料" as EditProfile
+        usecase "查看学习历史" as ViewHistory
+        usecase "管理收藏内容" as ManageBookmarks
+        usecase "设置通知偏好" as SetNotifications
+    }
+}
+
+'访客可以访问的功能
+Visitor --> ViewWelcome
+Visitor --> Login
+Visitor --> Register
+Visitor --> ResetPassword
+Visitor --> ThirdPartyLogin
+
+'登录相关的包含关系
+Login ..> VerifyPhone : <<include>>
+Register ..> VerifyPhone : <<include>>
+ResetPassword ..> VerifyEmail : <<include>>
+
+'登录成功后转换为学习者角色
+Login ..> BrowseRecommended : <<extend>>
+ThirdPartyLogin ..> BrowseRecommended : <<extend>>
+
+'定义基本关系
+Student --> BrowseRecommended
+Student --> SearchContent
+Student --> ViewNotifications
+Student --> ViewProfile
+Student --> BrowseResources
+Student --> BrowseQuestions
+
+'成就系统关系保持不变
+Student --> ViewAchievements
+Student --> ViewCurrentProgress
+Student --> SetCurrentAchievement
+Student --> CompleteTask
+Student --> ViewAchievementDetails
+
+'添加新的关系
+BrowseResources ..> BookmarkResource : <<extend>>
+BrowseResources ..> DownloadResource : <<extend>>
+BrowseResources ..> RateAndComment : <<extend>>
+BrowseResources ..> FilterResources : <<include>>
+
+BrowseQuestions ..> PostQuestion : <<extend>>
+BrowseQuestions ..> AnswerQuestion : <<extend>>
+BrowseQuestions ..> LikeAndCollect : <<extend>>
+BrowseQuestions ..> FilterQuestions : <<include>>
+
+ViewProfile ..> EditProfile : <<extend>>
+ViewProfile ..> ViewHistory : <<extend>>
+ViewProfile ..> ManageBookmarks : <<extend>>
+ViewProfile ..> SetNotifications : <<extend>>
+
+'成就相关的其他关系保持不变
+ViewAchievements ..> ViewStats : <<extend>>
+ViewCurrentProgress ..> ViewMilestones : <<extend>>
+ViewAchievementDetails ..> ShareAchievement : <<extend>>
+UnlockAchievement ..> GetRewards : <<extend>>
+ViewAchievementDetails ..> ShowAchievementDialog : <<include>>
+
+CompleteTask ..> UpdateProgress : <<include>>
+UpdateProgress ..> ValidateConditions : <<include>>
+UnlockAchievement ..> SaveState : <<include>>
+ViewCurrentProgress ..> CalculateProgress : <<include>>
+ViewCurrentProgress ..> ShowProgressAnimation : <<include>>
+
+'系统处理关系
+System --> ValidateConditions
+System --> UpdateProgress
+System --> SaveState
+System --> CalculateProgress
+System --> HandleJson
+System --> ManageMilestones
+
+SaveState ..> HandleJson : <<include>>
+ViewCurrentProgress ..> DrawMountainBackground : <<include>>
+ViewCurrentProgress ..> DrawProgressPath : <<include>>
+ManageMilestones ..> HandleJson : <<include>>
+
+'跨功能关系
+CompleteTask ..> UnlockAchievement : <<extend>>
+BookmarkResource ..> CompleteTask : <<extend>>
+AnswerQuestion ..> CompleteTask : <<extend>>
+DownloadResource ..> CompleteTask : <<extend>>
+
+'添加注释
+note right of SetCurrentAchievement
+  只能设置已解锁的成就
+  同时只能有一个当前探索
+  通过AchievementManager管理
+end note
+
+note right of CompleteTask
+  完成任务后自动更新进度
+  并检查是否达成新成就
+  触发进度动画显示
+end note
+
+note bottom of HandleJson
+  使用fromJson和toJson方法
+  处理Achievement和Milestone数据
+end note
+
+note bottom of DrawMountainBackground
+  使用MountainSilhouettePainter
+  绘制渐变山脉背景
+end note
+
+note bottom of DrawProgressPath
+  使用MountainPathPainter
+  绘制带动画的进度路径
+end note
+
+note right of BookmarkResource
+  收藏资源可能触发
+  "喜马拉雅收藏家"成就
+end note
+
+note right of AnswerQuestion
+  回答问题可能触发
+  相关学科的成就进度
+end note
+
+note right of Login
+  支持手机号/邮箱登录
+  记住登录状态
+  自动登录功能
+end note
+
+note right of ThirdPartyLogin
+  支持微信、QQ等
+  第三方快捷登录
+end note
+
+note right of ViewWelcome
+  展示应用特色
+  引导用户注册/登录
+  支持跳过直接体验
+end note
+
+'访客页面导航关系
+Visitor --> BrowseRecommended : <<limited>>
+note right on link
+  访客模式下
+  只能浏览有限内容
+end note
+
+Visitor --> ViewProfile : <<limited>>
+note right on link
+  访客模式下
+  只显示登录/注册入口
+end note
+
+Visitor --> ViewAchievements : <<limited>>
+note right on link
+  访客模式下
+  只能查看成就展示
+  无法获得进度
+end note
+
+'页面间导航关系
+package "页面导航" {
+    usecase "导航到主页" as NavigateToHome
+    usecase "导航到个人中心" as NavigateToProfile
+    usecase "导航到成就页面" as NavigateToAchievement
+    usecase "导航到资源页面" as NavigateToResource
+    usecase "导航到论坛页面" as NavigateToForum
+}
+
+'访客导航权限
+Visitor --> NavigateToHome
+Visitor --> NavigateToProfile
+Visitor --> NavigateToAchievement
+Visitor --> NavigateToResource
+Visitor --> NavigateToForum
+
+'导航与功能关系
+NavigateToHome ..> BrowseRecommended : <<include>>
+NavigateToProfile ..> ViewProfile : <<include>>
+NavigateToAchievement ..> ViewAchievements : <<include>>
+NavigateToResource ..> BrowseResources : <<include>>
+NavigateToForum ..> BrowseQuestions : <<include>>
+
+'导航触发登录
+NavigateToProfile ..> Login : <<extend>>
+NavigateToAchievement ..> Login : <<extend>>
+NavigateToResource ..> Login : <<extend>>
+NavigateToForum ..> Login : <<extend>>
+
+note "所有页面都可以通过底部导航栏互相切换" as N1
+NavigateToHome .. N1
+NavigateToProfile .. N1
+NavigateToAchievement .. N1
+NavigateToResource .. N1
+NavigateToForum .. N1
+
+@enduml 
