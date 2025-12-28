@@ -14,9 +14,5 @@ MUSTStudy is a curriculum-aligned learning hub that curates and annotates high-q
 *	Learn–Track–Reflect: After studying, students check in and monitor progress on the Achievement page (Overview, Progress, Daily Attendance, Today’s Stats, Heatmap). The app surfaces momentum and gaps without extra effort, supporting the evaluation metrics above. 
 
 
-## Resposiry Structure
-The source code for this project is not yet available as it is currently under active development. We will publish the code here as soon as it's ready. Stay tuned, we're excited to share it with you soon!
-
-
 
 
